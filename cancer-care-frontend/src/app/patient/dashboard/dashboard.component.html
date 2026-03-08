@@ -1,0 +1,433 @@
+<div class="dashboard-wrapper">
+  <app-patient-header></app-patient-header>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <!-- 1. Overview Dashboard -->
+    <section *ngIf="activeSection === 'overview'" class="content-section">
+      <div class="welcome-banner">
+        <h1>Bonjour, {{user?.firstName}} 👋</h1>
+        <p>Voici un aperçu de votre suivi médical</p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card blue">
+          <div class="metric-header">
+            <span class="metric-label">{{translate.translate('appointments')}}</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div class="metric-value">{{appointments.length}}</div>
+          <div class="metric-trend">Programmés</div>
+        </div>
+
+        <div class="metric-card green">
+          <div class="metric-header">
+            <span class="metric-label">{{translate.translate('prescriptions')}}</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="metric-value">{{prescriptions.length}}</div>
+          <div class="metric-trend">{{translate.translate('active')}}</div>
+        </div>
+
+        <div class="metric-card purple">
+          <div class="metric-header">
+            <span class="metric-label">{{translate.translate('medical')}}</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <div class="metric-value">{{medicalRecords.length}}</div>
+          <div class="metric-trend">{{translate.translate('documents')}}</div>
+        </div>
+
+        <div class="metric-card orange">
+          <div class="metric-header">
+            <span class="metric-label">{{translate.translate('messages')}}</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+            </svg>
+          </div>
+          <div class="metric-value">{{messages.length}}</div>
+          <div class="metric-trend">{{translate.translate('unread')}}</div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>{{translate.translate('nextAppointments')}}</h3>
+            <button class="text-btn" (click)="showSection('appointments')">Voir tout →</button>
+          </div>
+          <div class="panel-body">
+            <div class="list-item" *ngFor="let apt of appointments.slice(0,4)">
+              <div class="item-icon blue">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/>
+                </svg>
+              </div>
+              <div class="item-content">
+                <h4>Dr. {{apt.doctor?.user?.lastName}}</h4>
+                <p>{{apt.reason}}</p>
+                <span class="item-meta">{{apt.date | date:'dd MMM yyyy, HH:mm'}}</span>
+              </div>
+              <span class="badge" [ngClass]="apt.status">{{apt.status}}</span>
+            </div>
+            <div *ngIf="appointments.length === 0" class="empty-state">
+              <p>Aucun rendez-vous programmé</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>{{translate.translate('activePrescriptions')}}</h3>
+            <button class="text-btn" (click)="showSection('prescriptions')">Voir tout →</button>
+          </div>
+          <div class="panel-body">
+            <div class="list-item" *ngFor="let presc of prescriptions.slice(0,4)">
+              <div class="item-icon green">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z"/>
+                </svg>
+              </div>
+              <div class="item-content">
+                <h4>{{presc.diagnosis}}</h4>
+                <p>{{presc.medications?.length}} médicament(s)</p>
+              </div>
+            </div>
+            <div *ngIf="prescriptions.length === 0" class="empty-state">
+              <p>{{translate.translate('noPrescriptions')}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Profile (7️⃣ Consulter et modifier Profil) - REMOVED FROM DASHBOARD -->
+    <!-- Profile is now a separate page accessible via router -->
+
+    <!-- 3. Medical Records (8️⃣ Consulter Dossier Médical + 9️⃣ Télécharger PDF) -->
+    <section *ngIf="activeSection === 'medical'" class="content-section">
+      <div class="section-header">
+        <h2>{{translate.translate('medical')}}</h2>
+        <button class="primary-btn" (click)="downloadPDF()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+          </svg>
+          {{translate.translate('downloadPDF')}}
+        </button>
+      </div>
+
+      <div class="cards-grid">
+        <div class="modern-card" *ngFor="let record of medicalRecords">
+          <div class="card-content">
+            <h3>{{record.diagnosis?.primary || record.diagnosis}}</h3>
+            <p class="card-subtitle">{{record.treatments?.[0]?.name || record.treatment}}</p>
+            <div class="card-meta">
+              <span>📅 {{record.createdAt | date:'dd MMMM yyyy'}}</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="secondary-btn-sm" (click)="viewRecordDetails(record)">{{translate.translate('viewDetails')}}</button>
+            <button class="secondary-btn-sm" (click)="downloadRecordPDF(record._id)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M3 14a1 1 0 011-1h8a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div *ngIf="medicalRecords.length === 0" class="empty-placeholder">
+          <h3>{{translate.translate('noRecords')}}</h3>
+          <p>{{translate.translate('noRecordsDesc')}}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Appointments (🔟 Prendre RDV + 1️⃣1️⃣ Annuler RDV) -->
+    <section *ngIf="activeSection === 'appointments'" class="content-section">
+      <div class="section-header">
+        <h2>{{translate.translate('myAppointments')}}</h2>
+        <button class="primary-btn" (click)="newAppointment()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+          </svg>
+          Prendre rendez-vous
+        </button>
+      </div>
+
+      <div class="cards-grid">
+        <div class="modern-card" *ngFor="let apt of appointments">
+          <div class="card-badge" [ngClass]="apt.status">{{apt.status}}</div>
+          <div class="card-content">
+            <h3>Dr. {{apt.doctor?.user?.lastName}}</h3>
+            <p class="card-subtitle">{{apt.reason}}</p>
+            <div class="card-meta">
+              <span>📅 {{apt.date | date:'dd MMMM yyyy'}}</span>
+              <span>🕐 {{apt.date | date:'HH:mm'}}</span>
+            </div>
+          </div>
+          <div class="card-actions" *ngIf="apt.status === 'scheduled' || apt.status === 'pending'">
+            <button class="danger-btn-sm" (click)="cancelAppointment(apt._id)">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4.646 4.646a.5.5 0 01.708 0L8 7.293l2.646-2.647a.5.5 0 01.708.708L8.707 8l2.647 2.646a.5.5 0 01-.708.708L8 8.707l-2.646 2.647a.5.5 0 01-.708-.708L7.293 8 4.646 5.354a.5.5 0 010-.708z"/>
+              </svg>
+              Annuler
+            </button>
+          </div>
+        </div>
+        <div *ngIf="appointments.length === 0" class="empty-placeholder">
+          <h3>{{translate.translate('noAppointments')}}</h3>
+          <p>Vous n'avez pas encore de rendez-vous programmé</p>
+          <button class="primary-btn" (click)="newAppointment()">{{translate.translate('takeAppointment')}}</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Prescriptions (1️⃣2️⃣ Consulter Prescriptions + 1️⃣3️⃣ Rappels Médicaments) -->
+    <section *ngIf="activeSection === 'prescriptions'" class="content-section">
+      <div class="section-header">
+        <h2>{{translate.translate('prescriptions')}}</h2>
+      </div>
+
+      <div class="prescriptions-container">
+        <div class="prescription-card-modern" *ngFor="let presc of prescriptions">
+          <div class="presc-header">
+            <h3>{{presc.diagnosis}}</h3>
+            <div>
+              <button class="icon-btn-sm" (click)="viewPrescriptionDetails(presc)" style="margin-right: 8px;">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                  <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <button class="icon-btn-sm" (click)="downloadPrescriptionPDF(presc._id)">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="medications-grid">
+            <div class="med-item" *ngFor="let med of presc.medications">
+              <div class="med-icon-modern">💊</div>
+              <div class="med-details">
+                <h4>{{med.name}}</h4>
+                <p>{{med.dosage}} • {{med.frequency}}</p>
+                <span class="med-duration">{{translate.translate('duration')}}: {{med.duration}}</span>
+              </div>
+              <button class="reminder-btn" (click)="toggleReminder(med)" [class.active]="med.reminderActive">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z"/>
+                  <path d="M10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="prescriptions.length === 0" class="empty-placeholder">
+          <h3>{{translate.translate('noPrescriptions')}}</h3>
+          <p>{{translate.translate('noPrescriptionsDesc')}}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Messages (1️⃣4️⃣ Messagerie + 1️⃣5️⃣ Historique) -->
+    <section *ngIf="activeSection === 'messages'" class="content-section">
+      <div class="section-header">
+        <h2>{{translate.translate('messages')}}</h2>
+        <p style="color: #666; margin-top: 10px;">Conversation avec votre médecin assigné</p>
+      </div>
+
+      <div class="messages-panel">
+        <div class="messages-list-modern">
+          <div class="message-item-modern"
+               *ngFor="let msg of messages"
+               [ngClass]="{'sent': msg.sender._id === user._id, 'received': msg.sender._id !== user._id}">
+            <div class="msg-avatar" [ngClass]="{'avatar-sent': msg.sender._id === user._id}">
+              {{msg.sender?.firstName?.charAt(0)}}{{msg.sender?.lastName?.charAt(0)}}
+            </div>
+            <div class="msg-content">
+              <h4>{{msg.sender?.firstName}} {{msg.sender?.lastName}}</h4>
+              <p>{{msg.content}}</p>
+              <span class="msg-time">
+                {{msg.createdAt | date:'dd/MM/yyyy HH:mm'}}
+                <span *ngIf="msg.isRead && msg.receiver._id === user._id" class="msg-status">✓✓</span>
+              </span>
+            </div>
+          </div>
+          <div *ngIf="messages.length === 0" class="empty-state">
+            <p>{{translate.translate('noMessages')}}</p>
+            <p style="font-size: 14px; color: #999;">Commencez une conversation avec votre médecin</p>
+          </div>
+        </div>
+        <div class="message-input-modern">
+          <!-- Doctor Email Input -->
+          <div class="doctor-email-input">
+            <label>👨‍⚕️ Email du médecin:</label>
+            <input type="email"
+                   placeholder="exemple@gmail.com"
+                   [(ngModel)]="doctorEmail"
+                   class="email-input">
+          </div>
+
+          <!-- Message Input -->
+          <div style="display: flex; gap: 12px; align-items: flex-end;">
+            <input type="text"
+                   placeholder="Écrire un message au médecin..."
+                   [(ngModel)]="newMessage"
+                   (keyup.enter)="sendMessage()"
+                   class="message-text-input"
+                   style="flex: 1;">
+            <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage?.trim() || !doctorEmail?.trim()">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Resources (1️⃣6️⃣ Ressources Éducatives) -->
+    <section *ngIf="activeSection === 'resources'" class="content-section">
+      <div class="section-header">
+        <h2>Ressources Éducatives</h2>
+      </div>
+
+      <div class="resources-grid">
+        <div class="resource-card">
+          <div class="resource-icon">📖</div>
+          <h3>{{translate.translate('understandCancer')}}</h3>
+          <p>Articles et vidéos sur les différents types de cancer et leurs traitements</p>
+          <button class="resource-btn" (click)="openResource('cancer-info')">{{translate.translate('consult')}}</button>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🥗</div>
+          <h3>{{translate.translate('nutrition')}}</h3>
+          <p>Conseils alimentaires et recettes adaptées pendant le traitement</p>
+          <button class="resource-btn" (click)="openResource('nutrition')">{{translate.translate('consult')}}</button>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">🧘</div>
+          <h3>{{translate.translate('psychSupport')}}</h3>
+          <p>Ressources pour le bien-être mental et la gestion du stress</p>
+          <button class="resource-btn" (click)="openResource('psychology')">{{translate.translate('consult')}}</button>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">💪</div>
+          <h3>Activité physique</h3>
+          <p>Exercices adaptés et recommandations pendant le traitement</p>
+          <button class="resource-btn" (click)="openResource('physical-activity')">{{translate.translate('consult')}}</button>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">👥</div>
+          <h3>{{translate.translate('supportGroups')}}</h3>
+          <p>Rejoignez des communautés de patients et partagez vos expériences</p>
+          <button class="resource-btn" (click)="openResource('support-groups')">{{translate.translate('consult')}}</button>
+        </div>
+        <div class="resource-card">
+          <div class="resource-icon">📚</div>
+          <h3>Bibliothèque médicale</h3>
+          <p>Accédez à des documents et guides médicaux complets</p>
+          <button class="resource-btn" (click)="openResource('library')">{{translate.translate('consult')}}</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Resource Modal -->
+  <div class="modal-overlay" *ngIf="showResourceModal" (click)="closeResourceModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeResourceModal()">&times;</button>
+      <div *ngIf="selectedResource" [innerHTML]="selectedResource.content"></div>
+    </div>
+  </div>
+
+  <!-- Medical Record Details Modal -->
+  <div class="modal-overlay" *ngIf="showRecordModal" (click)="closeRecordModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeRecordModal()">&times;</button>
+      <div *ngIf="selectedRecord">
+        <h2>📋 Dossier Médical</h2>
+        <div style="margin: 20px 0;">
+          <h3>Diagnostic</h3>
+          <p><strong>Principal:</strong> {{selectedRecord.diagnosis?.primary}}</p>
+          <p *ngIf="selectedRecord.diagnosis?.secondary"><strong>Secondaire:</strong> {{selectedRecord.diagnosis?.secondary}}</p>
+          <p *ngIf="selectedRecord.diagnosis?.stage"><strong>Stade:</strong> {{selectedRecord.diagnosis?.stage}}</p>
+        </div>
+        <div style="margin: 20px 0;" *ngIf="selectedRecord.treatments?.length > 0">
+          <h3>Traitements</h3>
+          <div *ngFor="let treatment of selectedRecord.treatments" style="background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 5px;">
+            <p><strong>Type:</strong> {{treatment.type}}</p>
+            <p><strong>Nom:</strong> {{treatment.name}}</p>
+            <p *ngIf="treatment.protocol"><strong>Protocole:</strong> {{treatment.protocol}}</p>
+            <p *ngIf="treatment.startDate"><strong>Début:</strong> {{treatment.startDate | date:'dd/MM/yyyy'}}</p>
+          </div>
+        </div>
+        <div style="margin: 20px 0;" *ngIf="selectedRecord.medications?.length > 0">
+          <h3>Médicaments</h3>
+          <ul>
+            <li *ngFor="let med of selectedRecord.medications">{{med}}</li>
+          </ul>
+        </div>
+        <div style="margin: 20px 0;">
+          <p><strong>Date:</strong> {{selectedRecord.createdAt | date:'dd MMMM yyyy'}}</p>
+          <p *ngIf="selectedRecord.doctor"><strong>Médecin:</strong> Dr. {{selectedRecord.doctor.user?.lastName}}</p>
+        </div>
+        <button class="primary-btn" (click)="downloadRecordPDF(selectedRecord._id)" style="margin-top: 20px;">
+          📥 Télécharger PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prescription Details Modal -->
+  <div class="modal-overlay" *ngIf="showPrescriptionModal" (click)="closePrescriptionModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closePrescriptionModal()">&times;</button>
+      <div *ngIf="selectedPrescription">
+        <h2>💊 Prescription</h2>
+        <div style="margin: 20px 0;">
+          <p><strong>Diagnostic:</strong> {{selectedPrescription.diagnosis}}</p>
+          <p *ngIf="selectedPrescription.doctor"><strong>Médecin:</strong> Dr. {{selectedPrescription.doctor.user?.lastName}}</p>
+          <p><strong>Date:</strong> {{selectedPrescription.createdAt | date:'dd MMMM yyyy'}}</p>
+        </div>
+        <div style="margin: 20px 0;">
+          <h3>Médicaments</h3>
+          <div *ngFor="let med of selectedPrescription.medications" style="background: #f0fff4; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #2ecc71;">
+            <h4 style="margin: 0 0 10px 0;">💊 {{med.name}}</h4>
+            <p><strong>Dosage:</strong> {{med.dosage}}</p>
+            <p><strong>Fréquence:</strong> {{med.frequency}}</p>
+            <p><strong>Durée:</strong> {{med.duration}}</p>
+            <p *ngIf="med.instructions"><strong>Instructions:</strong> {{med.instructions}}</p>
+          </div>
+        </div>
+        <div style="margin: 20px 0;" *ngIf="selectedPrescription.notes">
+          <h3>Notes</h3>
+          <p>{{selectedPrescription.notes}}</p>
+        </div>
+        <button class="primary-btn" (click)="downloadPrescriptionPDF(selectedPrescription._id)" style="margin-top: 20px;">
+          📥 Télécharger PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="modern-footer">
+    <div class="footer-container">
+      <p>&copy; 2024 CancerCare • Tous droits réservés</p>
+      <div class="footer-links">
+        <a href="#">{{translate.translate('help')}}</a>
+        <a href="#">Confidentialité</a>
+        <a href="#">{{translate.translate('terms')}}</a>
+        <a href="#">{{translate.translate('contact')}}</a>
+      </div>
+      <p class="version">v1.0.0</p>
+    </div>
+  </footer>
+</div>

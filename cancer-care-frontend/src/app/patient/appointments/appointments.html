@@ -1,0 +1,272 @@
+<div class="appointments-container">
+  <!-- Tab Navigation -->
+  <div class="tabs">
+    <button
+      [class.active]="currentView === 'list'"
+      (click)="switchView('list')"
+      class="tab-btn">
+      📋 Mes rendez-vous
+    </button>
+    <button
+      [class.active]="currentView === 'book'"
+      (click)="switchView('book')"
+      class="tab-btn">
+      ➕ Prendre un rendez-vous
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="error" class="alert error-alert">
+    ⚠️ {{ error }}
+  </div>
+  <div *ngIf="success" class="alert success-alert">
+    ✅ {{ success }}
+  </div>
+
+  <!-- My Appointments View -->
+  <div *ngIf="currentView === 'list'" class="view-section">
+    <h2>Mes rendez-vous</h2>
+
+    <div *ngIf="loading" class="loading">
+      Chargement...
+    </div>
+
+    <div *ngIf="!loading && myAppointments.length === 0" class="empty-state">
+      <div class="empty-icon">📅</div>
+      <p>Vous n'avez pas de rendez-vous programmé</p>
+      <button (click)="switchView('book')" class="btn btn-primary">
+        Prendre un rendez-vous
+      </button>
+    </div>
+
+    <div *ngIf="!loading && myAppointments.length > 0" class="appointments-list">
+      <div *ngFor="let appointment of myAppointments"
+           class="appointment-card"
+           [attr.data-status]="appointment.status">
+
+        <div class="appointment-header">
+          <div class="appointment-info">
+            <h3>Dr. {{ appointment.doctor?.user?.name || 'Médecin' }}</h3>
+            <p class="specialty">{{ appointment.doctor?.specialization }}</p>
+          </div>
+          <span [class]="'status ' + getStatusClass(appointment.status)">
+            {{ getStatusLabel(appointment.status) }}
+          </span>
+        </div>
+
+        <div class="appointment-details">
+          <div class="detail-item">
+            <span class="label">📅 Date</span>
+            <span class="value">{{ formatDate(appointment.date) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">🕐 Heure</span>
+            <span class="value">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">🏥 Type</span>
+            <span class="value">
+              {{ appointment.type === 'consultation' ? 'Consultation' :
+                 appointment.type === 'follow-up' ? 'Suivi' :
+                 appointment.type === 'emergency' ? 'Urgence' :
+                 appointment.type === 'check-up' ? 'Vérification' :
+                 appointment.type === 'treatment' ? 'Traitement' : appointment.type }}
+            </span>
+          </div>
+          <div class="detail-item" *ngIf="appointment.isVirtual">
+            <span class="label">💻 Mode</span>
+            <span class="value">En ligne</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">📝 Raison</span>
+            <span class="value">{{ appointment.reason }}</span>
+          </div>
+          <div *ngIf="appointment.symptoms?.length > 0" class="detail-item">
+            <span class="label">🔍 Symptômes</span>
+            <div class="symptoms-list">
+              <span *ngFor="let symptom of appointment.symptoms" class="symptom-tag">
+                {{ symptom }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="appointment-actions">
+          <button
+            *ngIf="appointment.status === 'pending' || appointment.status === 'confirmed'"
+            (click)="openCancelDialog(appointment)"
+            class="btn btn-danger">
+            ❌ Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book Appointment View -->
+  <div *ngIf="currentView === 'book'" class="view-section">
+    <h2>Prendre un rendez-vous</h2>
+
+    <form (ngSubmit)="bookAppointment()" class="appointment-form">
+
+      <!-- Step 1: Select Doctor -->
+      <div class="form-section">
+        <h3>Étape 1: Sélectionner un médecin</h3>
+
+        <div *ngIf="doctors.length === 0" class="loading">
+          Chargement des médecins...
+        </div>
+
+        <div *ngIf="doctors.length > 0" class="doctors-grid">
+          <div
+            *ngFor="let doctor of doctors"
+            [class.selected]="selectedDoctor?._id === doctor._id"
+            (click)="selectDoctor(doctor)"
+            class="doctor-card">
+            <div class="doctor-avatar">👨‍⚕️</div>
+            <h4>{{ doctor.user?.name || 'Dr. Inconnu' }}</h4>
+            <p class="specialty">{{ doctor.specialization }}</p>
+            <p class="hospital">{{ doctor.hospital }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedDoctor" class="form-section">
+        <h3>Étape 2: Sélectionner date et heure</h3>
+
+        <div class="form-group">
+          <label>Date *</label>
+          <input
+            type="date"
+            [(ngModel)]="selectedDate"
+            name="date"
+            [min]="getMinDate()"
+            [max]="getMaxDate()"
+            (change)="loadAvailableSlots()"
+            required>
+        </div>
+
+        <div *ngIf="selectedDate && !loadingSlots && availableSlots.length > 0" class="form-group">
+          <label>Heure disponible *</label>
+          <div class="time-slots">
+            <button
+              *ngFor="let slot of availableSlots"
+              type="button"
+              [class.selected]="selectedTime === slot.time"
+              (click)="selectedTime = slot.time"
+              class="time-slot">
+              {{ slot.time }}
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="loadingSlots" class="loading">
+          Chargement des créneaux...
+        </div>
+      </div>
+
+      <div *ngIf="selectedDoctor && selectedDate && selectedTime" class="form-section">
+        <h3>Étape 3: Détails de la visite</h3>
+
+        <div class="form-group">
+          <label>Type de consultation *</label>
+          <select [(ngModel)]="appointmentType" name="type">
+            <option value="consultation">Consultation</option>
+            <option value="follow-up">Suivi</option>
+            <option value="check-up">Vérification</option>
+            <option value="treatment">Traitement</option>
+            <option value="emergency">Urgence</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Raison de la visite *</label>
+          <textarea
+            [(ngModel)]="reason"
+            name="reason"
+            placeholder="Décrire les raisons de votre visite"
+            required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Symptômes</label>
+          <div class="symptom-input">
+            <input
+              type="text"
+              [(ngModel)]="symptomInput"
+              name="symptom"
+              placeholder="Ajouter un symptôme"
+              (keyup.enter)="addSymptom()">
+            <button type="button" (click)="addSymptom()" class="btn btn-secondary">
+              ➕ Ajouter
+            </button>
+          </div>
+          <div *ngIf="symptoms.length > 0" class="symptoms-list">
+            <span *ngFor="let symptom of symptoms; let i = index" class="symptom-tag">
+              {{ symptom }}
+              <button type="button" (click)="removeSymptom(i)" class="remove-btn">✕</button>
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group checkbox">
+          <input
+            type="checkbox"
+            [(ngModel)]="isVirtual"
+            name="isVirtual"
+            id="isVirtual">
+          <label for="isVirtual">Consultation en ligne</label>
+        </div>
+
+        <div class="form-summary">
+          <h4>Résumé de votre rendez-vous</h4>
+          <p><strong>Médecin:</strong> Dr. {{ selectedDoctor.user?.name }}</p>
+          <p><strong>Date:</strong> {{ formatDate(selectedDate) }}</p>
+          <p><strong>Heure:</strong> {{ selectedTime }}</p>
+          <p><strong>Type:</strong> {{ appointmentType }}</p>
+          <p><strong>Mode:</strong> {{ isVirtual ? 'En ligne' : 'Au cabinet' }}</p>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="btn btn-primary btn-large">
+          {{ loading ? 'Création en cours...' : 'Confirmer le rendez-vous' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Cancel Appointment Modal -->
+  <div *ngIf="selectedCancelAppointment" class="modal-overlay" (click)="closeCancelDialog()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Annuler le rendez-vous</h3>
+
+      <div class="appointment-info">
+        <p><strong>Médecin:</strong> Dr. {{ selectedCancelAppointment.doctor?.user?.name }}</p>
+        <p><strong>Date:</strong> {{ formatDate(selectedCancelAppointment.date) }}</p>
+        <p><strong>Heure:</strong> {{ selectedCancelAppointment.startTime }}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Raison de l'annulation (optionnel)</label>
+        <textarea
+          [(ngModel)]="cancellationReason"
+          placeholder="Expliquer pourquoi vous annulez ce rendez-vous"
+          rows="3"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="closeCancelDialog()" class="btn btn-secondary">
+          Annuler
+        </button>
+        <button
+          (click)="confirmCancelAppointment()"
+          [disabled]="loading"
+          class="btn btn-danger">
+          {{ loading ? 'Annulation...' : 'Confirmer l\'annulation' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

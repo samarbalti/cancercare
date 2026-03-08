@@ -1,0 +1,223 @@
+<div class="appointments-container">
+  <h1>Gestion des Rendez-vous</h1>
+
+  <!-- Messages d'alerte -->
+  <div *ngIf="error" class="alert error-alert">
+    ⚠️ {{ error }}
+  </div>
+  <div *ngIf="success" class="alert success-alert">
+    ✅ {{ success }}
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs">
+    <button
+      [class.active]="activeTab === 'pending'"
+      (click)="switchTab('pending')"
+      class="tab-btn">
+      ⏳ En attente ({{ pendingAppointments.length }})
+    </button>
+    <button
+      [class.active]="activeTab === 'confirmed'"
+      (click)="switchTab('confirmed')"
+      class="tab-btn">
+      ✅ Confirmés ({{ confirmedAppointments.length }})
+    </button>
+    <button
+      [class.active]="activeTab === 'completed'"
+      (click)="switchTab('completed')"
+      class="tab-btn">
+      ✔️ Terminés ({{ completedAppointments.length }})
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    Chargement des rendez-vous...
+  </div>
+
+  <!-- Pending Appointments Tab -->
+  <div *ngIf="activeTab === 'pending' && !loading" class="tab-content">
+    <div *ngIf="pendingAppointments.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p>Aucun rendez-vous en attente</p>
+    </div>
+
+    <div *ngIf="pendingAppointments.length > 0" class="appointments-list">
+      <div *ngFor="let apt of pendingAppointments" class="appointment-card pending">
+        <div class="card-header">
+          <div class="patient-info">
+            <h3>{{ apt.patient?.user?.firstName || 'Patient' }} {{ apt.patient?.user?.lastName || '' }}</h3>
+            <p class="patient-email">📧 {{ apt.patient?.user?.email }}</p>
+          </div>
+          <span class="status pending-badge">⏳ En attente</span>
+        </div>
+
+        <div class="card-body">
+          <div class="grid">
+            <div class="detail">
+              <label>📅 Date</label>
+              <p>{{ formatDate(apt.date) }}</p>
+            </div>
+            <div class="detail">
+              <label>🕐 Heure</label>
+              <p>{{ apt.startTime }} - {{ apt.endTime }}</p>
+            </div>
+            <div class="detail">
+              <label>📝 Type</label>
+              <p>{{ apt.type }}</p>
+            </div>
+            <div class="detail" *ngIf="apt.isVirtual">
+              <label>💻 Mode</label>
+              <p>En ligne</p>
+            </div>
+          </div>
+
+          <div class="detail full-width">
+            <label>🔍 Raison de la visite</label>
+            <p>{{ apt.reason }}</p>
+          </div>
+
+          <div *ngIf="apt.symptoms?.length > 0" class="detail full-width">
+            <label>🩺 Symptômes</label>
+            <div class="symptoms">
+              <span *ngFor="let symptom of apt.symptoms" class="symptom-tag">
+                {{ symptom }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button
+            (click)="openConfirmationModal(apt)"
+            class="btn btn-confirm">
+            ✅ Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmed Appointments Tab -->
+  <div *ngIf="activeTab === 'confirmed' && !loading" class="tab-content">
+    <div *ngIf="confirmedAppointments.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p>Aucun rendez-vous confirmé</p>
+    </div>
+
+    <div *ngIf="confirmedAppointments.length > 0" class="appointments-list">
+      <div *ngFor="let apt of confirmedAppointments" class="appointment-card confirmed">
+        <div class="card-header">
+          <div class="patient-info">
+            <h3>{{ apt.patient?.user?.firstName || 'Patient' }} {{ apt.patient?.user?.lastName || '' }}</h3>
+            <p class="patient-email">📧 {{ apt.patient?.user?.email }}</p>
+          </div>
+          <span class="status confirmed-badge">✅ Confirmé</span>
+        </div>
+
+        <div class="card-body">
+          <div class="grid">
+            <div class="detail">
+              <label>📅 Date</label>
+              <p>{{ formatDate(apt.date) }}</p>
+            </div>
+            <div class="detail">
+              <label>🕐 Heure</label>
+              <p>{{ apt.startTime }} - {{ apt.endTime }}</p>
+            </div>
+            <div class="detail">
+              <label>📝 Type</label>
+              <p>{{ apt.type }}</p>
+            </div>
+          </div>
+
+          <div class="detail full-width">
+            <label>🔍 Raison</label>
+            <p>{{ apt.reason }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completed Appointments Tab -->
+  <div *ngIf="activeTab === 'completed' && !loading" class="tab-content">
+    <div *ngIf="completedAppointments.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p>Aucun rendez-vous passé</p>
+    </div>
+
+    <div *ngIf="completedAppointments.length > 0" class="appointments-list">
+      <div *ngFor="let apt of completedAppointments"
+           class="appointment-card"
+           [class.completed]="apt.status === 'completed'"
+           [class.no-show]="apt.status === 'no-show'">
+
+        <div class="card-header">
+          <div class="patient-info">
+            <h3>{{ apt.patient?.user?.firstName || 'Patient' }} {{ apt.patient?.user?.lastName || '' }}</h3>
+          </div>
+          <span class="status" [class.completed-badge]="apt.status === 'completed'" [class.no-show-badge]="apt.status === 'no-show'">
+            {{ apt.status === 'completed' ? '✔️ Terminé' : '❌ Non présent' }}
+          </span>
+        </div>
+
+        <div class="card-body">
+          <div class="grid">
+            <div class="detail">
+              <label>📅 Date</label>
+              <p>{{ formatDate(apt.date) }}</p>
+            </div>
+            <div class="detail">
+              <label>🕐 Heure</label>
+              <p>{{ apt.startTime }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div *ngIf="confirmationModalOpen && selectedAppointment" class="modal-overlay" (click)="closeConfirmationModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Confirmer le rendez-vous</h2>
+
+      <div class="appointment-summary">
+        <div class="summary-item">
+          <label>Patient</label>
+          <p>{{ selectedAppointment.patient?.user?.firstName }} {{ selectedAppointment.patient?.user?.lastName }}</p>
+        </div>
+        <div class="summary-item">
+          <label>📅 Date</label>
+          <p>{{ formatDate(selectedAppointment.date) }}</p>
+        </div>
+        <div class="summary-item">
+          <label>🕐 Heure</label>
+          <p>{{ selectedAppointment.startTime }} - {{ selectedAppointment.endTime }}</p>
+        </div>
+        <div class="summary-item">
+          <label>📝 Raison</label>
+          <p>{{ selectedAppointment.reason }}</p>
+        </div>
+      </div>
+
+      <p class="info-text">
+        L'email de confirmation sera automatiquement envoyé au patient.
+      </p>
+
+      <div class="modal-actions">
+        <button (click)="closeConfirmationModal()" class="btn btn-secondary">
+          Annuler
+        </button>
+        <button
+          (click)="confirmAppointment()"
+          [disabled]="loading"
+          class="btn btn-confirm">
+          {{ loading ? 'Confirmation en cours...' : 'Confirmer le rendez-vous' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,186 @@
+<div class="doctor-dashboard">
+  <header class="header">
+    <h1>🏥 Dashboard Médecin</h1>
+    <div>
+      <button class="btn-test" (click)="testAlert()">🚨 Test Alerte</button>
+      <button class="btn-logout" (click)="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <nav class="sidebar">
+    <button [class.active]="activeSection === 'overview'" (click)="showSection('overview')">📊 Vue d'ensemble</button>
+    <button [class.active]="activeSection === 'patients'" (click)="showSection('patients')">👥 Mes Patients</button>
+    <button [class.active]="activeSection === 'appointments'" (click)="showSection('appointments')">📅 Rendez-vous</button>
+    <button [class.active]="activeSection === 'messages'" (click)="showSection('messages')">💬 Messages</button>
+  </nav>
+
+  <main class="content">
+    <!-- OVERVIEW -->
+    <section *ngIf="activeSection === 'overview'">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <h3>{{stats.patients}}</h3>
+          <p>Patients actifs</p>
+        </div>
+        <div class="stat-card green">
+          <h3>{{stats.appointmentsToday}}</h3>
+          <p>RDV aujourd'hui</p>
+        </div>
+        <div class="stat-card orange">
+          <h3>{{stats.pendingAppointments}}</h3>
+          <p>RDV en attente</p>
+        </div>
+        <div class="stat-card red">
+          <h3>{{stats.alerts}}</h3>
+          <p>Alertes</p>
+        </div>
+      </div>
+
+      <div class="section-grid">
+        <div class="panel">
+          <h2>📅 Rendez-vous du jour</h2>
+          <div class="appointment-item" *ngFor="let apt of todayAppointments">
+            <div>
+              <strong>{{apt.patient?.firstName}} {{apt.patient?.lastName}}</strong>
+              <p>{{apt.reason}}</p>
+            </div>
+            <span class="time">{{apt.date | date:'HH:mm'}}</span>
+          </div>
+          <p *ngIf="todayAppointments.length === 0" class="empty">Aucun rendez-vous aujourd'hui</p>
+        </div>
+
+        <div class="panel">
+          <h2>🚨 Alertes Temps Réel</h2>
+          <div class="alert-item alert-{{alert.priority}}" *ngFor="let alert of realTimeAlerts.slice(0, 5)">
+            <strong>{{alert.title}}</strong>
+            <p>{{alert.message}}</p>
+            <small>{{alert.createdAt | date:'HH:mm'}}</small>
+          </div>
+          <p *ngIf="realTimeAlerts.length === 0" class="empty">Aucune alerte</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PATIENTS -->
+    <section *ngIf="activeSection === 'patients'">
+      <div class="section-header">
+        <h2>👥 Mes Patients</h2>
+        <div>
+          <button class="btn-primary" (click)="showAddPatientModal = true">➕ Ajouter Patient</button>
+          <button class="btn-secondary" (click)="exportPatients()">📥 Exporter PDF</button>
+        </div>
+      </div>
+
+      <table class="patients-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Diagnostic</th>
+            <th>Dernier RDV</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let patient of patients">
+            <td>{{patient.user?.firstName}} {{patient.user?.lastName}}</td>
+            <td>{{patient.diagnosis || 'Non spécifié'}}</td>
+            <td>{{patient.lastVisit | date:'dd/MM/yyyy'}}</td>
+            <td>
+              <button class="btn-sm" (click)="viewPatient(patient)">📋 Dossier</button>
+              <button class="btn-sm" (click)="prescribeTreatment(patient)">💊 Prescrire</button>
+              <button class="btn-sm btn-danger" (click)="deletePatient(patient)">🗑️ Supprimer</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="patients.length === 0" class="empty">Aucun patient</p>
+    </section>
+
+    <!-- APPOINTMENTS -->
+    <section *ngIf="activeSection === 'appointments'">
+      <h2>📅 Gestion des Rendez-vous</h2>
+      <div class="appointments-list">
+        <div class="appointment-card" *ngFor="let apt of todayAppointments">
+          <div class="apt-header">
+            <h3>{{apt.patient?.firstName}} {{apt.patient?.lastName}}</h3>
+            <span class="badge" [class]="apt.status">{{apt.status}}</span>
+          </div>
+          <p>{{apt.reason}}</p>
+          <small>{{apt.date | date:'dd/MM/yyyy HH:mm'}}</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section *ngIf="activeSection === 'messages'">
+      <h2>💬 Messages Patients</h2>
+      <div class="messages-list">
+        <div class="message-item" *ngFor="let msg of messages">
+          <strong>{{msg.from?.firstName}} {{msg.from?.lastName}}</strong>
+          <p>{{msg.content}}</p>
+          <small>{{msg.date | date:'dd/MM/yyyy HH:mm'}}</small>
+        </div>
+        <p *ngIf="messages.length === 0" class="empty">Aucun message</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- MODAL: Ajouter Patient -->
+<div class="modal" *ngIf="showAddPatientModal" (click)="showAddPatientModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>➕ Ajouter un Patient</h2>
+    <form (ngSubmit)="addPatient()">
+      <input [(ngModel)]="newPatient.email" name="email" type="email" placeholder="Email du patient" required>
+      <p style="color:#666; font-size:14px; margin:10px 0;">💡 Entrez l'email d'un patient existant pour l'assigner à votre liste</p>
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Ajouter</button>
+        <button type="button" class="btn-secondary" (click)="showAddPatientModal = false">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: Dossier Médical -->
+<div class="modal" *ngIf="showMedicalRecordModal" (click)="showMedicalRecordModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>📋 Dossier Médical</h2>
+    <div *ngIf="selectedPatient">
+      <h3>{{selectedPatient.user?.firstName}} {{selectedPatient.user?.lastName}}</h3>
+      <form (ngSubmit)="updateMedicalRecord()">
+        <label>Diagnostic</label>
+        <input [(ngModel)]="medicalRecordForm.diagnosis" name="diagnosis" placeholder="Ex: Cancer du sein stade 2">
+        <label>Traitement</label>
+        <textarea [(ngModel)]="medicalRecordForm.treatment" name="treatment" placeholder="Ex: Chimiothérapie + Radiothérapie"></textarea>
+        <label>Notes</label>
+        <textarea [(ngModel)]="medicalRecordForm.notes" name="notes" placeholder="Observations médicales..."></textarea>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Enregistrer</button>
+          <button type="button" class="btn-secondary" (click)="showMedicalRecordModal = false">Fermer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Prescription -->
+<div class="modal" *ngIf="showPrescriptionModal" (click)="showPrescriptionModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>💊 Nouvelle Prescription</h2>
+    <form (ngSubmit)="savePrescription()">
+      <input [(ngModel)]="newPrescription.diagnosis" name="diagnosis" placeholder="Diagnostic" required>
+      <div *ngFor="let med of newPrescription.medications; let i = index" class="medication-row">
+        <input [(ngModel)]="med.name" [name]="'medName'+i" placeholder="Médicament" required>
+        <input [(ngModel)]="med.dosage" [name]="'dosage'+i" placeholder="Dosage">
+        <input [(ngModel)]="med.frequency" [name]="'freq'+i" placeholder="Fréquence">
+        <input [(ngModel)]="med.duration" [name]="'dur'+i" placeholder="Durée">
+        <button type="button" (click)="removeMedication(i)" *ngIf="i > 0">❌</button>
+      </div>
+      <button type="button" class="btn-secondary" (click)="addMedication()">➕ Ajouter médicament</button>
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Créer Prescription</button>
+        <button type="button" class="btn-secondary" (click)="showPrescriptionModal = false">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>

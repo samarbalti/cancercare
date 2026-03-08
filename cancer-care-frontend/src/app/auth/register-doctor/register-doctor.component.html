@@ -1,0 +1,79 @@
+<div class="register-container">
+  <div class="register-box">
+    <h1>🏥 CancerCare</h1>
+    <h2>Inscription Médecin</h2>
+    <p class="info">⚠️ Votre compte sera validé par un administrateur avant activation</p>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prénom *</label>
+          <input type="text" [(ngModel)]="doctor.firstName" name="firstName" required>
+        </div>
+        <div class="form-group">
+          <label>Nom *</label>
+          <input type="text" [(ngModel)]="doctor.lastName" name="lastName" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" [(ngModel)]="doctor.email" name="email" required>
+      </div>
+
+      <div class="form-group">
+        <label>Mot de passe *</label>
+        <input type="password" [(ngModel)]="doctor.password" name="password" required minlength="6">
+      </div>
+
+      <div class="form-group">
+        <label>Téléphone</label>
+        <input type="tel" [(ngModel)]="doctor.phone" name="phone">
+      </div>
+
+      <h3>Informations professionnelles</h3>
+
+      <div class="form-group">
+        <label>Spécialisation *</label>
+        <input type="text" [(ngModel)]="doctor.specialization" name="specialization" required placeholder="Ex: Oncologie">
+      </div>
+
+      <div class="form-group">
+        <label>Numéro de licence *</label>
+        <input type="text" [(ngModel)]="doctor.licenseNumber" name="licenseNumber" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hôpital</label>
+          <input type="text" [(ngModel)]="doctor.hospital" name="hospital">
+        </div>
+        <div class="form-group">
+          <label>Département</label>
+          <input type="text" [(ngModel)]="doctor.department" name="department">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Années d'expérience</label>
+        <input type="number" [(ngModel)]="doctor.experience" name="experience" min="0">
+      </div>
+
+      <div class="form-group">
+        <label>Bio / Présentation</label>
+        <textarea [(ngModel)]="doctor.bio" name="bio" rows="3"></textarea>
+      </div>
+
+      <div class="error" *ngIf="error">{{ error }}</div>
+      <div class="success" *ngIf="success">{{ success }}</div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Inscription...' : 'S\'inscrire' }}
+      </button>
+    </form>
+
+    <p class="login-link">
+      Déjà un compte ? <a routerLink="/login">Se connecter</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<div class="admin-container">
+  <header class="top-bar">
+    <h1>🏥 CancerCare - Administration</h1>
+    <button class="btn-logout" (click)="logout()">Déconnexion</button>
+  </header>
+
+  <div class="dashboard">
+    <div class="stats">
+      <div class="card">
+        <h3>{{stats.users?.total || 0}}</h3>
+        <p>Utilisateurs</p>
+      </div>
+      <div class="card">
+        <h3>{{stats.users?.patients || 0}}</h3>
+        <p>Patients</p>
+      </div>
+      <div class="card">
+        <h3>{{stats.doctors?.total || 0}}</h3>
+        <p>Médecins</p>
+      </div>
+      <div class="card alert">
+        <h3>{{stats.doctors?.pending || 0}}</h3>
+        <p>En attente</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>⏳ Médecins en attente de validation</h2>
+      <div class="doctor-card" *ngFor="let doctor of pendingDoctors">
+        <div class="doctor-info">
+          <h3>Dr. {{doctor.user?.firstName}} {{doctor.user?.lastName}}</h3>
+          <p>{{doctor.specialization}}</p>
+          <small>Inscrit le {{doctor.user?.createdAt | date:'dd/MM/yyyy'}}</small>
+        </div>
+        <button class="btn-approve" (click)="verifyDoctor(doctor._id)">✅ Approuver</button>
+      </div>
+      <p *ngIf="pendingDoctors.length === 0" style="text-align: center; color: #95a5a6; padding: 20px;">
+        Aucun médecin en attente de validation
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>👥 Utilisateurs récents</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of recentUsers">
+            <td>{{user.firstName}} {{user.lastName}}</td>
+            <td>{{user.email}}</td>
+            <td><span class="badge" [class]="user.role">{{user.role}}</span></td>
+            <td>{{user.createdAt | date:'dd/MM/yyyy'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

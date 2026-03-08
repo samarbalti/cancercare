@@ -1,0 +1,266 @@
+.doctor-dashboard {
+  display: grid;
+  grid-template: auto 1fr / 200px 1fr;
+  height: 100vh;
+  background: #f5f7fa;
+}
+
+.header {
+  grid-column: 1 / -1;
+  background: #2c3e50;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header div {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-test {
+  padding: 0.5rem 1rem;
+  background: #f39c12;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar {
+  background: white;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-right: 1px solid #e0e0e0;
+}
+
+.sidebar button {
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.sidebar button:hover {
+  background: #f0f0f0;
+}
+
+.sidebar button.active {
+  background: #3498db;
+  color: white;
+}
+
+.content {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-card h3 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.stat-card.blue { border-left: 4px solid #3498db; }
+.stat-card.green { border-left: 4px solid #2ecc71; }
+.stat-card.orange { border-left: 4px solid #f39c12; }
+.stat-card.red { border-left: 4px solid #e74c3c; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.panel {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.panel h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.appointment-item, .alert-item {
+  padding: 1rem;
+  border-left: 3px solid #3498db;
+  background: #f8f9fa;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+.alert-item.alert-critical {
+  border-left-color: #e74c3c;
+  background: #ffebee;
+}
+
+.alert-item.alert-high {
+  border-left-color: #f39c12;
+  background: #fff3e0;
+}
+
+.alert-item.alert-medium {
+  border-left-color: #3498db;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.patients-table {
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.patients-table th, .patients-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.patients-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+}
+
+.btn-primary, .btn-secondary, .btn-sm, .btn-logout {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: #3498db;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2980b9;
+}
+
+.btn-secondary {
+  background: #95a5a6;
+  color: white;
+  margin-left: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  margin-right: 0.5rem;
+  background: #ecf0f1;
+}
+
+.btn-sm.btn-danger {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-logout {
+  background: #e74c3c;
+  color: white;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content input, .modal-content select, .modal-content textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.medication-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.empty {
+  text-align: center;
+  color: #95a5a6;
+  padding: 2rem;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge.pending { background: #fff3cd; color: #856404; }
+.badge.confirmed { background: #d4edda; color: #155724; }
+.badge.completed { background: #d1ecf1; color: #0c5460; }

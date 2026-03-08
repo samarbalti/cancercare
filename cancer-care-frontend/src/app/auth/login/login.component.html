@@ -1,0 +1,75 @@
+<div class="login-container">
+  <nav class="auth-nav">
+    <a routerLink="/" class="nav-logo">🏥 CancerCare</a>
+    <div class="nav-actions">
+      <a routerLink="/register">S'inscrire</a>
+    </div>
+  </nav>
+  <div class="login-box">
+    <div class="logo">
+      <div class="logo-icon">🏥</div>
+      <h1>CancerCare</h1>
+      <p>Plateforme de gestion de santé</p>
+    </div>
+
+    <h2>Connexion</h2>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Adresse email</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            required
+            placeholder="exemple@email.com"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            required
+            placeholder="••••••••"
+          >
+        </div>
+      </div>
+
+      <div class="options">
+        <label class="remember">
+          <input type="checkbox">
+          <span>Se souvenir de moi</span>
+        </label>
+        <a href="#" class="forgot">Mot de passe oublié ?</a>
+      </div>
+
+      <div class="error" *ngIf="error">
+        ⚠️ {{ error }}
+      </div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
+      </button>
+    </form>
+
+    <div class="divider">
+      <span>OU</span>
+    </div>
+
+
+
+    <p class="register-link">
+      Pas encore de compte ?
+      <a routerLink="/register">Patient</a> |
+      <a routerLink="/register-doctor">Médecin</a>
+    </p>
+  </div>
+</div>

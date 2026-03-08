@@ -1,0 +1,141 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h2>Mon Profil Médecin</h2>
+    <button *ngIf="!editMode" (click)="toggleEdit()" class="btn-edit">Modifier</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Chargement...</div>
+
+  <div *ngIf="message" class="alert-success">{{ message }}</div>
+  <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+  <div *ngIf="profile && !loading" class="profile-content">
+    <!-- Informations personnelles -->
+    <div class="section">
+      <h3>Informations Personnelles</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Nom</label>
+          <p>{{ profile.user?.lastName }}</p>
+        </div>
+        <div class="info-item">
+          <label>Prénom</label>
+          <p>{{ profile.user?.firstName }}</p>
+        </div>
+        <div class="info-item">
+          <label>Email</label>
+          <p>{{ profile.user?.email }}</p>
+        </div>
+        <div class="info-item">
+          <label>Téléphone</label>
+          <p>{{ profile.user?.phone || 'Non renseigné' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations professionnelles -->
+    <div class="section">
+      <h3>Informations Professionnelles</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Spécialisation</label>
+          <p *ngIf="!editMode">{{ profile.specialization }}</p>
+          <input *ngIf="editMode" [(ngModel)]="profile.specialization" />
+        </div>
+        <div class="info-item">
+          <label>Numéro de licence</label>
+          <p>{{ profile.licenseNumber }}</p>
+        </div>
+        <div class="info-item">
+          <label>Hôpital</label>
+          <p *ngIf="!editMode">{{ profile.hospital }}</p>
+          <input *ngIf="editMode" [(ngModel)]="profile.hospital" />
+        </div>
+        <div class="info-item">
+          <label>Département</label>
+          <p *ngIf="!editMode">{{ profile.department || 'Non renseigné' }}</p>
+          <input *ngIf="editMode" [(ngModel)]="profile.department" />
+        </div>
+        <div class="info-item">
+          <label>Durée consultation (min)</label>
+          <p *ngIf="!editMode">{{ profile.appointmentDuration || 30 }}</p>
+          <input *ngIf="editMode" type="number" [(ngModel)]="profile.appointmentDuration" />
+        </div>
+        <div class="info-item">
+          <label>Frais de consultation (€)</label>
+          <p *ngIf="!editMode">{{ profile.consultationFee || 'Non renseigné' }}</p>
+          <input *ngIf="editMode" type="number" [(ngModel)]="profile.consultationFee" />
+        </div>
+        <div class="info-item full-width">
+          <label>Biographie</label>
+          <p *ngIf="!editMode">{{ profile.bio || 'Non renseigné' }}</p>
+          <textarea *ngIf="editMode" [(ngModel)]="profile.bio" rows="4"></textarea>
+        </div>
+        <div class="info-item full-width">
+          <label>Langues parlées</label>
+          <p *ngIf="!editMode">{{ profile.languages?.join(', ') || 'Non renseigné' }}</p>
+          <input *ngIf="editMode" [(ngModel)]="profile.languages" placeholder="Séparer par des virgules" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Disponibilités -->
+    <div class="section" *ngIf="editMode">
+      <h3>Disponibilités</h3>
+      <div class="availability-list">
+        <div *ngFor="let slot of profile.availability; let i = index" class="availability-item">
+          <select [(ngModel)]="slot.day">
+            <option value="Monday">Lundi</option>
+            <option value="Tuesday">Mardi</option>
+            <option value="Wednesday">Mercredi</option>
+            <option value="Thursday">Jeudi</option>
+            <option value="Friday">Vendredi</option>
+            <option value="Saturday">Samedi</option>
+            <option value="Sunday">Dimanche</option>
+          </select>
+          <input type="time" [(ngModel)]="slot.startTime" />
+          <span>à</span>
+          <input type="time" [(ngModel)]="slot.endTime" />
+          <button (click)="removeAvailability(i)" class="btn-remove">✕</button>
+        </div>
+        <button (click)="addAvailability()" class="btn-add">+ Ajouter une disponibilité</button>
+      </div>
+    </div>
+
+    <div class="section" *ngIf="!editMode && profile.availability?.length > 0">
+      <h3>Disponibilités</h3>
+      <div class="availability-display">
+        <div *ngFor="let slot of profile.availability" class="availability-slot">
+          <strong>{{ slot.day }}</strong>: {{ slot.startTime }} - {{ slot.endTime }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="section">
+      <h3>Statistiques</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">{{ profile.patients?.length || 0 }}</div>
+          <div class="stat-label">Patients</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ profile.isVerified ? 'Oui' : 'Non' }}</div>
+          <div class="stat-label">Vérifié</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ profile.rating || 'N/A' }}</div>
+          <div class="stat-label">Note moyenne</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div *ngIf="editMode" class="action-buttons">
+      <button (click)="saveProfile()" class="btn-save" [disabled]="loading">
+        {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+      <button (click)="toggleEdit()" class="btn-cancel">Annuler</button>
+    </div>
+  </div>
+</div>

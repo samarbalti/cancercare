@@ -1,0 +1,45 @@
+<header class="header">
+  <div class="container">
+    <div class="logo" [routerLink]="['/patient/home']" style="cursor: pointer;">
+      <svg width="40" height="40" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="18" fill="url(#gradient)"/>
+        <path d="M20 10 L20 30 M10 20 L30 20" stroke="white" stroke-width="3"/>
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#667eea"/>
+            <stop offset="100%" style="stop-color:#764ba2"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>CancerCare</span>
+    </div>
+    
+    <nav class="nav-menu" [class.rtl]="currentLang === 'ar'">
+      <a [routerLink]="['/patient/home']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">{{t('home')}}</a>
+      <a [routerLink]="['/patient/dashboard']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">{{t('dashboard')}}</a>
+      <a [routerLink]="['/patient/appointments']" routerLinkActive="active">{{t('appointments')}}</a>
+      <a [routerLink]="['/patient/medical']" routerLinkActive="active">{{t('medical')}}</a>
+      <a [routerLink]="['/patient/prescriptions']" routerLinkActive="active">{{t('prescriptions')}}</a>
+      <a [routerLink]="['/patient/messages']" routerLinkActive="active">{{t('messages')}}</a>
+      <a [routerLink]="['/patient/resources']" routerLinkActive="active">{{t('resources')}}</a>
+      <a [routerLink]="['/patient/profile']" routerLinkActive="active">{{t('profile')}}</a>
+    </nav>
+    
+    <div class="nav-actions">
+      <div class="language-selector">
+        <select [(ngModel)]="currentLang" (change)="changeLanguage()">
+          <option value="fr">🇫🇷 FR</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="ar">🇹🇳 AR</option>
+        </select>
+      </div>
+      <button class="btn-logout" (click)="logout()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 11-2 0V4H5v12h10v-2a1 1 0 112 0v3a1 1 0 01-1 1H4a1 1 0 01-1-1V3z"/>
+          <path d="M11 10a1 1 0 011-1h5.586l-1.293-1.293a1 1 0 011.414-1.414l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L17.586 11H12a1 1 0 01-1-1z"/>
+        </svg>
+        {{t('logout')}}
+      </button>
+    </div>
+  </div>
+</header>

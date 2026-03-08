@@ -1,0 +1,121 @@
+<div class="doctor-dashboard">
+  <nav class="sidebar">
+    <div class="logo">
+      <span class="icon">🏥</span>
+      <h2>CancerCare</h2>
+      <p>Espace Médecin</p>
+    </div>
+
+    <ul class="menu">
+      <li>
+        <a routerLink="/doctor/dashboard" routerLinkActive="active">
+          <span>📊</span> Tableau de bord
+        </a>
+      </li>
+      <li>
+        <a routerLink="/doctor/patients" routerLinkActive="active">
+          <span>👥</span> Mes Patients
+        </a>
+      </li>
+      <li>
+        <a routerLink="/doctor/appointments" routerLinkActive="active">
+          <span>📅</span> Rendez-vous
+        </a>
+      </li>
+      <li>
+        <a routerLink="/doctor/messages" routerLinkActive="active">
+          <span>💬</span> Messages
+          <span class="badge" *ngIf="stats.unreadMessages > 0">{{stats.unreadMessages}}</span>
+        </a>
+      </li>
+      <li>
+        <a (click)="logout()" class="logout">
+          <span>🚪</span> Déconnexion
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="content">
+    <header>
+      <h1>Tableau de bord</h1>
+      <div class="date">{{today | date:'fullDate'}}</div>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="icon">📅</div>
+        <div class="info">
+          <h3>{{stats.todayAppointments}}</h3>
+          <p>RDV Aujourd'hui</p>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="icon">👥</div>
+        <div class="info">
+          <h3>{{stats.totalPatients}}</h3>
+          <p>Patients Totaux</p>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="icon">⏳</div>
+        <div class="info">
+          <h3>{{stats.pendingAppointments}}</h3>
+          <p>RDV en attente</p>
+        </div>
+      </div>
+      <div class="stat-card danger">
+        <div class="icon">💬</div>
+        <div class="info">
+          <h3>{{stats.unreadMessages}}</h3>
+          <p>Messages non lus</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="card">
+        <div class="card-header">
+          <h3>Prochains rendez-vous</h3>
+          <a routerLink="/doctor/appointments">Voir tout →</a>
+        </div>
+        <div class="appointment-list">
+          <div *ngFor="let apt of upcomingAppointments" class="appointment-item">
+            <div class="time">
+              <span class="hour">{{apt.startTime}}</span>
+              <span class="date">{{apt.date | date:'dd/MM'}}</span>
+            </div>
+            <div class="patient-info">
+              <strong>{{apt.patient?.user?.firstName}} {{apt.patient?.user?.lastName}}</strong>
+              <span>{{apt.reason}}</span>
+            </div>
+            <span class="status" [class]="apt.status">{{apt.status}}</span>
+          </div>
+          <div *ngIf="upcomingAppointments.length === 0" class="empty">
+            Aucun rendez-vous à venir
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Patients récents</h3>
+          <a routerLink="/doctor/patients">Voir tout →</a>
+        </div>
+        <div class="patient-list">
+          <div *ngFor="let patient of recentPatients" class="patient-item">
+            <div class="avatar">{{patient.user?.firstName?.[0]}}{{patient.user?.lastName?.[0]}}</div>
+            <div class="info">
+              <strong>{{patient.user?.firstName}} {{patient.user?.lastName}}</strong>
+              <span>Dernier RDV: {{patient.lastVisit | date:'dd/MM/yyyy'}}</span>
+            </div>
+            <button class="btn-view">Voir</button>
+          </div>
+          <div *ngIf="recentPatients.length === 0" class="empty">
+            Aucun patient récent
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

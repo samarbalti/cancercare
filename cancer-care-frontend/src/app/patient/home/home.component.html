@@ -1,0 +1,186 @@
+<div class="home-wrapper" [class.rtl]="translate.isRTL()">
+  <app-patient-header></app-patient-header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>{{translate.translate('welcome')}} {{user?.firstName}} 👋</h1>
+        <p>{{translate.translate('heroSubtitle')}}</p>
+        <button class="btn-primary" (click)="navigateTo('dashboard')">{{translate.translate('accessDashboard')}}</button>
+      </div>
+      <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop" alt="Support médical">
+      </div>
+    </div>
+  </section>
+
+  <!-- Video Motivation -->
+  <section class="motivation-section">
+    <div class="container">
+      <h2>{{translate.translate('hopeMessage')}} 💪</h2>
+      <div class="videos-grid">
+        <div class="video-item">
+          <iframe 
+            width="100%" 
+            height="300" 
+            src="https://www.youtube.com/embed/ZXsQAXx_ao0" 
+            title="Message de motivation" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+          <h3>{{translate.translate('video1Title')}}</h3>
+        </div>
+        <div class="video-item">
+          <iframe 
+            width="100%" 
+            height="300" 
+            src="https://www.youtube.com/embed/Kb24RrHIbFk" 
+            title="Témoignage inspirant" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+          <h3>{{translate.translate('video2Title')}}</h3>
+        </div>
+        <div class="video-item">
+          <iframe 
+            width="100%" 
+            height="300" 
+            src="https://www.youtube.com/embed/mgmVOuLgFB0" 
+            title="Conseils de spécialistes" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+          <h3>{{translate.translate('video3Title')}}</h3>
+        </div>
+      </div>
+      <p class="motivation-text">{{translate.translate('motivationQuote')}}</p>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services">
+    <div class="container">
+      <h2>{{translate.translate('ourServices')}}</h2>
+      <div class="services-grid">
+        <div class="service-card" (click)="navigateTo('dashboard')">
+          <div class="service-image">
+            <img src="https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=400&h=300&fit=crop" alt="Rendez-vous">
+          </div>
+          <div class="service-content">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <h3>{{translate.translate('appointmentsTitle')}}</h3>
+            <p>{{translate.translate('appointmentsDesc')}}</p>
+          </div>
+        </div>
+        
+        <div class="service-card" (click)="navigateTo('dashboard')">
+          <div class="service-image">
+            <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=300&fit=crop" alt="Dossier médical">
+          </div>
+          <div class="service-content">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3>{{translate.translate('medicalTitle')}}</h3>
+            <p>{{translate.translate('medicalDesc')}}</p>
+          </div>
+        </div>
+        
+        <div class="service-card" (click)="navigateTo('dashboard')">
+          <div class="service-image">
+            <img src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=300&fit=crop" alt="Prescriptions">
+          </div>
+          <div class="service-content">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <h3>{{translate.translate('prescriptionsTitle')}}</h3>
+            <p>{{translate.translate('prescriptionsDesc')}}</p>
+          </div>
+        </div>
+        
+        <div class="service-card" (click)="navigateTo('dashboard')">
+          <div class="service-image">
+            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=300&fit=crop" alt="Messages">
+          </div>
+          <div class="service-content">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+            </svg>
+            <h3>{{translate.translate('messagesTitle')}}</h3>
+            <p>{{translate.translate('messagesDesc')}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <div class="container">
+      <h2>{{translate.translate('testimonials')}} 🌟</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="Patient">
+          <p>"Grâce à CancerCare, j'ai pu suivre mon traitement sereinement. L'équipe est formidable."</p>
+          <h4>Sarah M.</h4>
+        </div>
+        <div class="testimonial-card">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Patient">
+          <p>"Un accompagnement exceptionnel. Je me sens soutenu à chaque étape."</p>
+          <h4>Ahmed K.</h4>
+        </div>
+        <div class="testimonial-card">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" alt="Patient">
+          <p>"La plateforme est intuitive et le suivi médical est impeccable."</p>
+          <h4>Leila B.</h4>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>CancerCare</h4>
+          <p>{{translate.translate('healthPriority')}}</p>
+          <div class="social-links">
+            <a href="#">📘</a>
+            <a href="#">📷</a>
+            <a href="#">🐦</a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>{{translate.translate('quickLinks')}}</h4>
+          <a (click)="navigateTo('dashboard')">{{translate.translate('dashboard')}}</a>
+          <a (click)="navigateTo('profile')">{{translate.translate('myProfile')}}</a>
+          <a href="#">{{translate.translate('resources')}}</a>
+          <a href="#">{{translate.translate('faq')}}</a>
+        </div>
+        <div class="footer-section">
+          <h4>{{translate.translate('contact')}}</h4>
+          <p>📧 support@cancercare.com</p>
+          <p>📞 +216 XX XXX XXX</p>
+          <p>📍 Tunis, Tunisie</p>
+        </div>
+        <div class="footer-section">
+          <h4>{{translate.translate('emergency')}}</h4>
+          <p class="emergency">🚨 190</p>
+          <p>{{translate.translate('emergencyLine')}}</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 CancerCare. {{translate.translate('copyright')}}</p>
+        <p>{{translate.translate('madeWith')}}</p>
+      </div>
+    </div>
+  </footer>
+</div>
