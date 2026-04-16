@@ -5,7 +5,7 @@ const Prescription = require('../models/Prescription');
 const MedicalRecord = require('../models/MedicalRecord');
 const Message = require('../models/Message');
 const User = require('../models/User');
-const Alert = require('../models/Alert');
+const ChatHistory = require('../models/ChatHistory');
 const { sendNotification } = require('../services/socketService');
 
 // @desc    Get doctor dashboard

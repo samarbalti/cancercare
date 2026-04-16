@@ -1,0 +1,205 @@
+<div class="alert-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-title">
+      <h1>🚨 Centre d'Alertes</h1>
+      <p>Surveillance des patients en temps réel</p>
+    </div>
+
+    <div class="header-stats">
+      <div class="stat-card stat-total">
+        <span class="stat-value">{{ stats.total }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-card stat-new" [class.pulse]="stats.new > 0">
+        <span class="stat-value">{{ stats.new }}</span>
+        <span class="stat-label">Nouvelles</span>
+      </div>
+      <div class="stat-card stat-critical" [class.pulse]="stats.critical > 0">
+        <span class="stat-value">{{ stats.critical }}</span>
+        <span class="stat-label">Critiques</span>
+      </div>
+      <div class="stat-card stat-today">
+        <span class="stat-value">{{ stats.today }}</span>
+        <span class="stat-label">Aujourd'hui</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-bar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+      <input type="text" [(ngModel)]="searchQuery" (input)="onFilterChange()" placeholder="Rechercher patient...">
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="filterStatus" (change)="onFilterChange()">
+        <option value="all">Tous statuts</option>
+        <option value="new">🔴 Nouveau</option>
+        <option value="viewed">🔵 Vu</option>
+        <option value="handled">🟡 En cours</option>
+        <option value="resolved">🟢 Résolu</option>
+      </select>
+
+      <select [(ngModel)]="filterSeverity" (change)="onFilterChange()">
+        <option value="all">Toutes sévérités</option>
+        <option value="critical">🔴 Critique</option>
+        <option value="high">🟠 Haute</option>
+        <option value="medium">🟡 Moyenne</option>
+        <option value="low">🟢 Basse</option>
+      </select>
+
+      <select [(ngModel)]="filterType" (change)="onFilterChange()">
+        <option *ngFor="let type of alertTypes" [value]="type.value">
+          {{ type.icon }} {{ type.label }}
+        </option>
+      </select>
+    </div>
+
+    <button class="btn-refresh" (click)="loadAlerts()" [disabled]="isLoading">
+      <svg [class.spin]="isLoading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+      </svg>
+      Actualiser
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="dashboard-content">
+    <!-- Liste Alertes -->
+    <div class="alerts-panel" [class.compact]="selectedAlert">
+      <div class="alerts-list" *ngIf="filteredAlerts.length > 0; else noAlerts">
+        <div *ngFor="let alert of filteredAlerts" class="alert-item"
+          [class.selected]="selectedAlert?._id === alert._id"
+          [class.unread]="alert.status === 'new'"
+          [class.urgent]="alert.severity === 'critical'"
+          (click)="selectAlert(alert)">
+
+          <div class="alert-icon" [style.background]="getSeverityColor(alert.severity)">
+            {{ getTypeIcon(alert.type) }}
+          </div>
+
+          <div class="alert-content">
+            <div class="alert-header">
+              <span class="patient-name">
+                {{ alert.patient?.firstName }} {{ alert.patient?.lastName }}
+              </span>
+              <span class="alert-time">{{ formatTimeAgo(alert.createdAt) }}</span>
+            </div>
+
+            <p class="alert-description">{{ alert.description }}</p>
+
+            <div class="alert-footer">
+              <span class="badge badge-severity" [style.background]="getSeverityColor(alert.severity)">
+                {{ getSeverityIcon(alert.severity) }} {{ alert.severity }}
+              </span>
+              <span class="badge badge-type">
+                {{ getTypeIcon(alert.type) }} {{ getTypeLabel(alert.type) }}
+              </span>
+              <span class="badge" [class]="'badge-' + alert.status">
+                {{ getStatusLabel(alert.status) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="alert-indicator" *ngIf="alert.status === 'new'"></div>
+        </div>
+      </div>
+
+      <ng-template #noAlerts>
+        <div class="empty-state">
+          <div class="empty-icon">✅</div>
+          <h3>Aucune alerte</h3>
+          <p>Tous vos patients vont bien !</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Détail Alert -->
+    <div class="detail-panel" *ngIf="selectedAlert">
+      <div class="detail-header">
+        <button class="btn-close" (click)="selectedAlert = null">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+
+        <div class="patient-info">
+          <h2>{{ selectedAlert.patient?.firstName }} {{ selectedAlert.patient?.lastName }}</h2>
+          <span class="alert-date">{{ selectedAlert.createdAt | date:'dd/MM/yyyy à HH:mm' }}</span>
+        </div>
+
+        <div class="alert-badges">
+          <span class="badge badge-severity" [style.background]="getSeverityColor(selectedAlert.severity)">
+            {{ getSeverityIcon(selectedAlert.severity) }} {{ selectedAlert.severity }}
+          </span>
+          <span class="badge badge-type">
+            {{ getTypeIcon(selectedAlert.type) }} {{ getTypeLabel(selectedAlert.type) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="detail-content">
+        <div class="context-section">
+          <h4>📝 Contexte</h4>
+          <p class="context-text">{{ selectedAlert.context || selectedAlert.description }}</p>
+        </div>
+
+        <!-- Rapport Patient -->
+        <div class="report-section" *ngIf="patientReport && !isLoadingReport">
+          <h4>📊 Rapport Hebdomadaire</h4>
+
+          <div class="report-grid">
+            <div class="report-card">
+              <span class="report-value" [style.color]="getSeverityColor(patientReport.averageStress > 0.7 ? 'critical' : patientReport.averageStress > 0.4 ? 'medium' : 'low')">
+                {{ (patientReport.averageStress * 100).toFixed(0) }}%
+              </span>
+              <span class="report-label">Stress moyen</span>
+            </div>
+            <div class="report-card">
+              <span class="report-value">{{ patientReport.totalMessages }}</span>
+              <span class="report-label">Messages</span>
+            </div>
+            <div class="report-card">
+              <span class="report-value">{{ patientReport.alertsCount }}</span>
+              <span class="report-label">Alertes</span>
+            </div>
+          </div>
+
+          <div class="recommendations" *ngIf="patientReport.recommendations.length">
+            <h5>💡 Recommandations</h5>
+            <ul>
+              <li *ngFor="let rec of patientReport.recommendations">{{ rec }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="loading-report" *ngIf="isLoadingReport">
+          <div class="spinner"></div>
+          <span>Chargement du rapport...</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="detail-actions">
+        <button class="btn-handle" (click)="handleAlert(selectedAlert._id)"
+          *ngIf="selectedAlert.status !== 'handled' && selectedAlert.status !== 'resolved'">
+          ✓ Prendre en charge
+        </button>
+
+        <button class="btn-resolve" (click)="resolveAlert(selectedAlert._id)"
+          *ngIf="selectedAlert.status !== 'resolved'">
+          ✓✓ Marquer résolu
+        </button>
+
+        <a [routerLink]="['/doctor/patients', selectedAlert.patient?._id]" class="btn-view-patient">
+          👁️ Voir dossier
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

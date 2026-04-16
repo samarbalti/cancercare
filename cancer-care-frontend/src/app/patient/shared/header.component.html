@@ -13,7 +13,7 @@
       </svg>
       <span>CancerCare</span>
     </div>
-    
+
     <nav class="nav-menu" [class.rtl]="currentLang === 'ar'">
       <a [routerLink]="['/patient/home']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">{{t('home')}}</a>
       <a [routerLink]="['/patient/dashboard']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">{{t('dashboard')}}</a>
@@ -22,9 +22,10 @@
       <a [routerLink]="['/patient/prescriptions']" routerLinkActive="active">{{t('prescriptions')}}</a>
       <a [routerLink]="['/patient/messages']" routerLinkActive="active">{{t('messages')}}</a>
       <a [routerLink]="['/patient/resources']" routerLinkActive="active">{{t('resources')}}</a>
+      <a [routerLink]="['/patient/chatbot']" routerLinkActive="active">🤖 Dr. Sara</a>
       <a [routerLink]="['/patient/profile']" routerLinkActive="active">{{t('profile')}}</a>
     </nav>
-    
+
     <div class="nav-actions">
       <div class="language-selector">
         <select [(ngModel)]="currentLang" (change)="changeLanguage()">

@@ -19,15 +19,16 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['patient'] },
     children: [
-      { path: 'home', component: PatientHomeComponent },
-      { path: 'dashboard', component: DashboardComponent },
+      { path: 'home',         component: PatientHomeComponent },
+      { path: 'dashboard',    component: DashboardComponent },
       { path: 'appointments', component: DashboardComponent, data: { section: 'appointments' } },
-      { path: 'medical', component: DashboardComponent, data: { section: 'medical' } },
-      { path: 'prescriptions', component: DashboardComponent, data: { section: 'prescriptions' } },
-      { path: 'messages', component: DashboardComponent, data: { section: 'messages' } },
-      { path: 'resources', component: DashboardComponent, data: { section: 'resources' } },
-      { path: 'profile', component: ProfileComponent },
+      { path: 'medical',      component: DashboardComponent, data: { section: 'medical' } },
+      { path: 'prescriptions',component: DashboardComponent, data: { section: 'prescriptions' } },
+      { path: 'messages',     component: DashboardComponent, data: { section: 'messages' } },
+      { path: 'resources',    component: DashboardComponent, data: { section: 'resources' } },
+      { path: 'profile',      component: ProfileComponent },
       { path: 'medical-records', component: MedicalRecordComponent },
+      { path: 'chatbot', loadComponent: () => import('../components/chatbot/chatbot.component').then(m => m.ChatbotComponent) },
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]
   }

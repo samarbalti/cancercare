@@ -4,6 +4,12 @@
     <button class="btn-logout" (click)="logout()">Déconnexion</button>
   </header>
 
+  <nav class="admin-nav">
+    <a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/admin/users" routerLinkActive="active">Utilisateurs</a>
+    <a routerLink="/admin/doctors" routerLinkActive="active">Médecins</a>
+  </nav>
+
   <div class="dashboard">
     <div class="stats">
       <div class="card">

@@ -1,0 +1,6 @@
+<!-- patient/navbar/navbar.component.html -->
+<a routerLink="/patient/chatbot" routerLinkActive="active" class="nav-link">
+  <span class="icon">🤖</span>
+  <span>Dr. Sara</span>
+  <span class="badge" *ngIf="unreadAlerts > 0">{{ unreadAlerts }}</span>
+</a>

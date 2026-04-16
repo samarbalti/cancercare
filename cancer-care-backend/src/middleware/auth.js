@@ -1,78 +1,74 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Vérifier si l'utilisateur est connecté
+// ==============================
+// Protect middleware
+// ==============================
 exports.protect = async (req, res, next) => {
   try {
     let token;
 
-    console.log('🔐 Auth middleware - Headers:', req.headers.authorization);
-    
-    // Vérifier header Authorization
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    console.log('🔐 Auth headers:', req.headers.authorization);
+
+    // Bearer token
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
       token = req.headers.authorization.split(' ')[1];
     }
-    // Vérifier cookie (optionnel)
+
+    // Cookie token (optional)
     else if (req.cookies?.token) {
       token = req.cookies.token;
     }
 
-    console.log('🔐 Token found:', token ? 'YES' : 'NO');
-
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Not authorized to access this route'
+        message: 'Not authorized, no token'
       });
     }
 
-    try {
-      // Vérifier token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log('🔐 Token decoded, user ID:', decoded.id);
+    // verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Vérifier si l'utilisateur existe toujours
-      const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id);
 
-      if (!user) {
-        console.log('❌ User not found');
-        return res.status(401).json({
-          success: false,
-          message: 'User no longer exists'
-        });
-      }
-
-      console.log('✅ User found:', user.email, 'Role:', user.role);
-
-      // Vérifier si le compte est actif
-      if (!user.isActive) {
-        return res.status(401).json({
-          success: false,
-          message: 'Your account has been suspended. Please contact support.'
-        });
-      }
-
-      // Ajouter l'utilisateur à la requête
-      req.user = user;
-      next();
-
-    } catch (error) {
-      console.log('❌ Token verification failed:', error.message);
+    if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Not authorized to access this route'
+        message: 'User not found'
       });
     }
 
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: 'Account suspended'
+      });
+    }
+
+    req.user = user;
+    next();
+
   } catch (error) {
-    next(error);
+    console.error('❌ Auth error:', error.message);
+
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized'
+    });
   }
 };
 
-// Optionnel: Authentification par cookie
+
+// ==============================
+// Cookie auth (optional)
+// ==============================
 exports.protectCookie = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies?.token;
 
     if (!token) {
       return res.status(401).json({
@@ -83,10 +79,11 @@ exports.protectCookie = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decoded.id);
+
     next();
 
   } catch (error) {
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
       message: 'Not authorized'
     });

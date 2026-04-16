@@ -29,9 +29,6 @@ export class DashboardComponent implements OnInit {
   selectedRecord: any = null;
   showPrescriptionModal = false;
   selectedPrescription: any = null;
-
-  // COPIEZ CE CODE ET REMPLACEZ LE TABLEAU resources DANS dashboard.component.ts
-
 resources = [
   {
     id: 'cancer-info',
@@ -762,6 +759,10 @@ resources = [
 
   showSection(section: string) {
     this.activeSection = section;
+  }
+
+  navigateToChatbot() {
+    this.router.navigate(['/patient/chatbot']);
   }
 
   viewProfile() {

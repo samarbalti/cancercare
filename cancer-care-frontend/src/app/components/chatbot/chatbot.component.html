@@ -1,0 +1,73 @@
+<div class="chatbot-wrapper">
+
+  <!-- MESSAGES -->
+  <div class="messages-container">
+
+    <div *ngIf="messages.length === 0" class="welcome-message">
+      <div class="welcome-icon">🤖</div>
+      <h3>Assistant CancerCare</h3>
+      <p>Bonjour ! Comment puis-je vous aider aujourd'hui ?</p>
+    </div>
+
+    <div
+      *ngFor="let message of messages"
+      class="message"
+      [class.user-message]="message.role === 'user'"
+      [class.assistant-message]="message.role === 'assistant'"
+    >
+      <div class="message-avatar">
+        {{ message.role === 'user' ? '👤' : '🤖' }}
+      </div>
+
+      <div class="message-content">
+
+        <div
+          class="message-bubble"
+          [innerHTML]="formatContent(message.content)"
+        ></div>
+
+        <div
+          *ngIf="message.stressAnalysis?.detected"
+          class="stress-badge"
+          [style.background-color]="getStressColor(message.stressAnalysis?.score || 0)"
+        >
+          {{ getStressIcon(message.stressAnalysis?.score || 0) }}
+          Stress : {{ message.stressAnalysis?.score || 0 }}%
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LOADING INDICATOR -->
+    <div *ngIf="isLoading" class="message assistant-message">
+      <div class="message-avatar">🤖</div>
+      <div class="message-content">
+        <div class="message-bubble typing">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-container">
+
+    <textarea
+      [(ngModel)]="inputMessage"
+      placeholder="Écrivez votre message... (Entrée pour envoyer)"
+      (keydown)="handleKeydown($event)"
+      rows="2"
+    ></textarea>
+
+    <button
+      (click)="sendMessage()"
+      [disabled]="!inputMessage.trim() || isLoading"
+      class="btn-send"
+    >
+      {{ isLoading ? '...' : '➤' }}
+    </button>
+
+  </div>
+
+</div>

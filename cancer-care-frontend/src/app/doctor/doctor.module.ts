@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from '../guards/auth.guard';
 import { RoleGuard } from '../guards/role.guard';
 import { DoctorDashboardComponent } from './dashboard/dashboard.component';
+import { AlertDashboardComponent } from './alert-dashboard/alert-dashboard.component';
 
 const routes: Routes = [
   {
@@ -13,6 +14,7 @@ const routes: Routes = [
     data: { roles: ['doctor'] },
     children: [
       { path: 'dashboard', component: DoctorDashboardComponent },
+      { path: 'alerts',    component: AlertDashboardComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   }
@@ -22,7 +24,8 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
-    DoctorDashboardComponent
+    DoctorDashboardComponent,
+    AlertDashboardComponent
   ]
 })
 export class DoctorModule { }

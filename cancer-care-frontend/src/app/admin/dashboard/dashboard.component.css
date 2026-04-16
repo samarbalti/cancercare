@@ -32,6 +32,32 @@
   background: #c0392b;
 }
 
+.admin-nav {
+  background: white;
+  padding: 0 40px;
+  border-bottom: 1px solid #ecf0f1;
+  display: flex;
+  gap: 30px;
+}
+
+.admin-nav a {
+  padding: 15px 0;
+  color: #7f8c8d;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.admin-nav a:hover {
+  color: #3498db;
+}
+
+.admin-nav a.active {
+  color: #3498db;
+  border-bottom-color: #3498db;
+}
+
 .dashboard {
   padding: 40px;
   max-width: 1400px;

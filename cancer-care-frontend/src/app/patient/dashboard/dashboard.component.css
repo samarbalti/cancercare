@@ -245,6 +245,11 @@
 .metric-card.green svg { color: #10b981; }
 .metric-card.purple svg { color: #8b5cf6; }
 .metric-card.orange svg { color: #f59e0b; }
+.metric-card.chatbot-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+.metric-card.chatbot-card .metric-label { color: rgba(255,255,255,0.9); }
+.metric-card.chatbot-card .metric-value { color: white; }
+.metric-card.chatbot-card .metric-trend { color: rgba(255,255,255,0.8); }
+.metric-card.chatbot-card .chatbot-icon { font-size: 24px; }
 
 .metric-value {
   font-size: 36px;
@@ -1172,4 +1177,39 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Chatbot flottant */
+.chatbot-fab-wrapper {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+}
+
+.chatbot-fab-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102,126,234,0.5);
+  transition: transform 0.2s;
+}
+
+.chatbot-fab-btn:hover {
+  transform: scale(1.1);
+}
+
+.chatbot-fab-panel {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  width: 370px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  overflow: hidden;
 }

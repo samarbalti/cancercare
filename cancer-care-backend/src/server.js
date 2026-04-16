@@ -1,122 +1,73 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const compression = require('compression');
-const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
+const dotenv = require('dotenv');
 const path = require('path');
-require('dotenv').config();
 
-const connectDB = require('./config/database');
-const errorHandler = require('./middleware/errorHandler');
+// Charger les variables d'environnement
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-const authRoutes = require('./routes/auth.routes');
-const patientRoutes = require('./routes/patient.routes');
-const doctorRoutes = require('./routes/doctor.routes');
-const adminRoutes = require('./routes/admin.routes');
-const chatbotRoutes = require('./routes/chatbot.routes');
-const notificationRoutes = require('./routes/notification.routes');
-const appointmentRoutes = require('./routes/appointment.routes');
+const PORT = process.env.PORT || 3001;
 
+// Create Express app directly here (no separate app.js needed)
 const app = express();
 
-connectDB();
+// Middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
-app.use(helmet());
-
+// CORS configuration
+const cors = require('cors');
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://localhost:4201', 'http://127.0.0.1:4200', 'http://127.0.0.1:4201'],
+  origin: (origin, callback) => {
+    if (!origin || /^https?:\/\/localhost(:[0-9]+)?$/.test(origin) || /^https?:\/\/127\.0\.0\.1(:[0-9]+)?$/.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api/', limiter);
+// Import routes
+const authRoutes = require('./routes/auth.routes.js');
+const adminRoutes = require('./routes/admin.routes.js');
+const doctorRoutes = require('./routes/doctor.routes.js');
+const patientRoutes = require('./routes/patient.routes.js');
+const appointmentRoutes = require('./routes/appointment.routes.js');
+const notificationRoutes = require('./routes/notification.routes.js');
+const chatbotRoutes = require('./routes/chatbot.routes.js');
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 50,
-  message: 'Too many authentication attempts, please try again later.'
-});
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/register-patient', authLimiter);
-app.use('/api/auth/register-doctor', authLimiter);
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(cookieParser());
-app.use(compression());
-
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
-
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Server is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
-  });
-});
-
+// Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/patient', patientRoutes);
-app.use('/api/doctor', doctorRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/doctor', doctorRoutes);
+app.use('/api/patient', patientRoutes);
+app.use('/api/appointment', appointmentRoutes);
+app.use('/api/notification', notificationRoutes);
 app.use('/api/chatbot', chatbotRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/appointments', appointmentRoutes);
 
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-app.use(errorHandler);
-
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`
-  ╔════════════════════════════════════════════════╗
-  ║                                                ║
-  ║       🏥 CancerCare Backend Server 🏥         ║
-  ║                                                ║
-  ║   Environment: ${process.env.NODE_ENV || 'development'}            ║
-  ║   Port: ${PORT}                              ║
-  ║   URL: http://localhost:${PORT}                     ║
-  ║                                                ║
-  ╚════════════════════════════════════════════════╝
-  `);
+// Error handling
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ success: false, error: err.message });
 });
 
-// Initialize Socket.io
-const { initializeSocket } = require('./services/socketService');
-initializeSocket(server);
-console.log('✅ Socket.io initialisé');
-
-process.on('unhandledRejection', (err) => {
-  console.error('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.error(err.name, err.message);
-  server.close(() => {
+// Connect to MongoDB and start server
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cancercare')
+  .then(() => {
+    console.log('✅ Connected to MongoDB');
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err);
     process.exit(1);
   });
-});
-
-process.on('SIGTERM', () => {
-  console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
-  server.close(() => {
-    console.log('💥 Process terminated!');
-  });
-});

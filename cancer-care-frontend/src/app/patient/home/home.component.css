@@ -65,6 +65,56 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
+/* Chatbot Section */
+.chatbot-section {
+  padding: 4rem 0;
+  background: #f8f9fa;
+}
+
+.chatbot-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.chatbot-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.chatbot-card h2 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.chatbot-card p {
+  color: #7f8c8d;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.btn-chatbot {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn-chatbot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
 /* Motivation Section */
 .motivation-section {
   padding: 4rem 0;
@@ -329,22 +379,22 @@
   .hero .container {
     grid-template-columns: 1fr;
   }
-  
+
   .hero-content h1 {
     font-size: 2rem;
   }
-  
+
   .services-grid,
   .testimonials-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .nav {
     flex-wrap: wrap;
     gap: 0.5rem;
     font-size: 0.875rem;
   }
-  
+
   .nav a {
     font-size: 0.875rem;
   }

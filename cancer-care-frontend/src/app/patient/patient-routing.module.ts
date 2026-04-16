@@ -8,6 +8,7 @@ const routes: Routes = [
   { path: 'home', component: PatientHomeComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'chatbot', loadComponent: () => import('../components/chatbot/chatbot.component').then(m => m.ChatbotComponent) },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];
 

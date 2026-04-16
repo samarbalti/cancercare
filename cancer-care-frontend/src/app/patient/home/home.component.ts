@@ -24,7 +24,7 @@ export class PatientHomeComponent implements OnInit {
     if (userData) {
       this.user = JSON.parse(userData);
     }
-    
+
     window.addEventListener('languageChanged', () => {
       this.user = { ...this.user };
     });
@@ -32,5 +32,9 @@ export class PatientHomeComponent implements OnInit {
 
   navigateTo(route: string) {
     this.router.navigate([`/patient/${route}`]);
+  }
+
+  navigateToChatbot() {
+    this.router.navigate(['/patient/chatbot']);
   }
 }

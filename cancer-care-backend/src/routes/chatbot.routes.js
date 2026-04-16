@@ -1,25 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth');
-const { restrictTo } = require('../middleware/rbac');
+const chatbotController = require('../controllers/chatbotController.js');
 
-// Import du contrôleur - vérifie ce chemin
-const chatbotController = require('../controllers/chatbotController');
+// Chat
+router.post('/message', chatbotController.chat);
+router.post('/chat/stream', chatbotController.streamChat);
 
-// Debug - décommente pour voir ce qui est importé
-// console.log('Chatbot Controller:', chatbotController);
-// console.log('sendMessage:', chatbotController.sendMessage);
+// Scan prescription
+router.post('/scan-prescription', chatbotController.scanPrescription);
 
-// Protected routes for patients
-router.use(protect);
+// History
+router.get('/history/:patientId', chatbotController.getHistory);
+router.get('/session/:sessionId', chatbotController.getSessionDetails);
+router.get('/stats/:patientId', chatbotController.getStats);
 
-router.post('/message', restrictTo('patient'), chatbotController.sendMessage);
-router.get('/history', restrictTo('patient'), chatbotController.getHistory);
-router.get('/history/:sessionId', restrictTo('patient'), chatbotController.getConversation);
-router.post('/end-session', restrictTo('patient'), chatbotController.endSession);
-router.post('/feedback', restrictTo('patient'), chatbotController.submitFeedback);
+// Alerts (doctor dashboard)
+router.get('/alerts', chatbotController.getAlerts);
+router.post('/alerts/:alertId/viewed', chatbotController.markAlertAsViewed);
+router.post('/alerts/:alertId/handle', chatbotController.handleAlert);
+router.post('/alerts/:alertId/resolve', chatbotController.resolveAlert);
+router.get('/patients/:patientId/report', chatbotController.getPatientReport);
 
-// Admin stats
-router.get('/stats', restrictTo('admin'), chatbotController.getStats);
+// Upload knowledge
+router.post('/upload-knowledge', chatbotController.uploadKnowledge);
+
+// Health
+router.get('/health', (req, res) => {
+  res.json({ status: 'OK', services: ['groq', 'rag', 'ocr', 'stress-detection'] });
+});
 
 module.exports = router;

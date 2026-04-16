@@ -6,7 +6,7 @@ const { protect } = require('../middleware/auth');
 
 // Validation middleware
 const registerPatientValidation = [
-  body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
+  body('email').isEmail().toLowerCase().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('firstName').trim().notEmpty().withMessage('First name is required'),
   body('lastName').trim().notEmpty().withMessage('Last name is required'),
@@ -17,7 +17,7 @@ const registerPatientValidation = [
 ];
 
 const registerDoctorValidation = [
-  body('email').isEmail().normalizeEmail().withMessage('Email valide requis'),
+  body('email').isEmail().toLowerCase().withMessage('Email valide requis'),
   body('password').isLength({ min: 6 }).withMessage('Mot de passe minimum 6 caractères'),
   body('firstName').trim().notEmpty().withMessage('Prénom requis'),
   body('lastName').trim().notEmpty().withMessage('Nom requis'),

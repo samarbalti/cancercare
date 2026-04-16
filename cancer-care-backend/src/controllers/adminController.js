@@ -3,7 +3,6 @@ const Patient = require('../models/Patient');
 const Doctor = require('../models/Doctor');
 const Appointment = require('../models/Appointment');
 const MedicalRecord = require('../models/MedicalRecord');
-const ChatbotLog = require('../models/ChatbotLog');
 
 // @desc    Get admin dashboard stats
 // @route   GET /api/admin/dashboard
@@ -35,11 +34,7 @@ exports.getDashboard = async (req, res, next) => {
         }),
         pending: await Appointment.countDocuments({ status: 'pending' })
       },
-      medicalRecords: await MedicalRecord.countDocuments(),
-      emergencies: await ChatbotLog.countDocuments({
-        emergencyDetected: true,
-        createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-      })
+      medicalRecords: await MedicalRecord.countDocuments()
     };
 
     // Recent activity
@@ -400,19 +395,6 @@ exports.getStatistics = async (req, res, next) => {
         }
       ]),
 
-      chatbotStats: await ChatbotLog.aggregate([
-        { $match: { createdAt: dateFilter } },
-        {
-          $group: {
-            _id: null,
-            totalConversations: { $sum: 1 },
-            emergenciesDetected: {
-              $sum: { $cond: ['$emergencyDetected', 1, 0] }
-            },
-            avgSessionDuration: { $avg: '$sessionDuration' }
-          }
-        }
-      ])
     };
 
     res.status(200).json({
@@ -425,40 +407,8 @@ exports.getStatistics = async (req, res, next) => {
   }
 };
 
-// @desc    Get all chatbot emergency logs
-// @route   GET /api/admin/emergencies
-// @access  Private (Admin)
 exports.getEmergencyLogs = async (req, res, next) => {
-  try {
-    const { status, page = 1, limit = 20 } = req.query;
-    
-    let query = { emergencyDetected: true };
-    if (status === 'pending') query.doctorNotified = false;
-    if (status === 'resolved') query.doctorNotified = true;
-
-    const emergencies = await ChatbotLog.find(query)
-      .populate('patient', 'user')
-      .populate('notifiedDoctor', 'user')
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit));
-
-    const total = await ChatbotLog.countDocuments(query);
-
-    res.status(200).json({
-      success: true,
-      count: emergencies.length,
-      total,
-      pagination: {
-        page: parseInt(page),
-        pages: Math.ceil(total / limit)
-      },
-      data: emergencies
-    });
-
-  } catch (error) {
-    next(error);
-  }
+  res.status(200).json({ success: true, data: [] });
 };
 
 // @desc    Manage educational resources

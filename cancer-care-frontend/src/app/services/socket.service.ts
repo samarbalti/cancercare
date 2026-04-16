@@ -34,6 +34,7 @@ export class SocketService {
     }
   }
 
+  // Méthode générique
   on(event: string): Observable<any> {
     return new Observable(observer => {
       this.socket?.on(event, (data: any) => {
@@ -44,5 +45,79 @@ export class SocketService {
 
   emit(event: string, data: any) {
     this.socket?.emit(event, data);
+  }
+
+  // ============================================
+  // MÉTHODES SPÉCIFIQUES POUR ALERTES
+  // ============================================
+
+  /**
+   * Écouter les nouvelles alertes en temps réel
+   */
+  onNewAlert(): Observable<any> {
+    return this.on('NEW_ALERT');
+  }
+
+  /**
+   * Écouter les mises à jour d'alertes
+   */
+  onAlertUpdate(): Observable<any> {
+    return this.on('ALERT_UPDATE');
+  }
+
+  /**
+   * Écouter les notifications générales
+   */
+  onNotification(): Observable<any> {
+    return this.on('notification');
+  }
+
+  /**
+   * Écouter les messages du chatbot
+   */
+  onChatMessage(): Observable<any> {
+    return this.on('chat_message');
+  }
+
+  /**
+   * Écouter quand un patient se connecte
+   */
+  onPatientOnline(): Observable<any> {
+    return this.on('patient_online');
+  }
+
+  /**
+   * Écouter les mises à jour de statut patient
+   */
+  onPatientStatus(): Observable<any> {
+    return this.on('patient_status_update');
+  }
+
+  /**
+   * Rejoindre une room spécifique
+   */
+  joinRoom(room: string) {
+    this.emit('join_room', room);
+  }
+
+  /**
+   * Quitter une room
+   */
+  leaveRoom(room: string) {
+    this.emit('leave_room', room);
+  }
+
+  /**
+   * Vérifier si le socket est connecté
+   */
+  isConnected(): boolean {
+    return this.socket?.connected || false;
+  }
+
+  /**
+   * Obtenir l'ID du socket
+   */
+  getSocketId(): string | undefined {
+    return this.socket?.id;
   }
 }
